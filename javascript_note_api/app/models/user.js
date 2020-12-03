@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const dcrypt = require('bcrypt')
 
 let noteSchema = new mongoose.Schema({
     title: String,
@@ -11,6 +12,22 @@ let noteSchema = new mongoose.Schema({
         required: true
     }
 
+})
+
+userSchema.pre('save', function (next) {
+    if (this.isNew || this.isModified('password')) {
+        const document = this
+        bcrypt.hash(this.password, 10,
+            (err, hashedPassword) => {
+                if (err)
+                    next(err);
+                else {
+                    this.password = hashedPassword;
+                    next();
+                }
+            });
+
+    }
 })
 
 
