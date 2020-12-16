@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { Router } = require('express');
+const router = require('../routes/users');
 
 let userSchema = new mongoose.Schema({
     name: String,
@@ -21,7 +23,16 @@ userSchema.pre('save', function(next){
                 }
             });
     }
-
 })
+
+userSchema.methods.isCorrectPassword = function(password, callback){
+    bcrypt.compare(password, this.password, function(err, same){
+        if(err)
+            callback(err)
+        else
+            callback(err, same)
+    })
+
+}
 
 module.exports = mongoose.model('User', userSchema)
